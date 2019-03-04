@@ -1,6 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Date, text, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 #from conf.config_manager import GlobalConf
@@ -24,8 +25,8 @@ class Datastore(Base):
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(250), nullable=False)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     zone = Column(String(250), nullable=False)
     conn_type = Column(String(50), nullable=False)
 
@@ -45,9 +46,9 @@ class Entity(Base):
     location = Column(String(250), nullable=False)
     datastore_id = Column(Integer, ForeignKey("dq2_datastore.id"))
     unq_row_id = Column(String(250), nullable=False)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    datastore = relationship("Datastore", backref=backref("entities", uselist=False))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+    datastore = relationship("Datastore", backref=backref("entities", uselist=False,cascade="all,delete"))
 
     def __init__(self, name, subsidiary_name, domain_name, zone,type,location,datastore_id,unq_row_id):
          self.name = name
@@ -66,8 +67,8 @@ class RuleType(Base):
     name = Column(String(250), nullable=False)
     template_query = Column(String(250), nullable=False)
     implementation_name = Column(String(100), nullable=False)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
     def __init__(self, name,template_query,implemetation_name):
         self.name = name
@@ -84,10 +85,10 @@ class RuleTypeParameter(Base):
     name = Column(String(250), nullable=False)
     mandatory_flg = Column(String(250), nullable=False)
     default_value = Column(String(250), nullable=False)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     ruletype = relationship("RuleType", foreign_keys=[rule_type_id],
-                            backref=backref("ruletypeparameters", lazy='joined'))
+                            backref=backref("ruletypeparameters", lazy='joined',cascade="all,delete"))
 
 
     def __init__(self, rule_type_id, name, mandatory_flg, default_value):
@@ -108,10 +109,10 @@ class RuleAssignment(Base):
     stop_job_flg = Column(String(250), nullable=False)
     target_entity_id = Column(Integer, ForeignKey("dq2_entity.id"))
     source_entity_id = Column(Integer, ForeignKey("dq2_entity.id"))
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     store_result_to_db_flg = Column(String(1), nullable=False, default=text('N'))
-    ruletype = relationship("RuleType", foreign_keys=[rule_type_id], backref=backref("ruleassignment", lazy='joined'))
+    ruletype = relationship("RuleType", foreign_keys=[rule_type_id], backref=backref("ruleassignment", lazy='joined',cascade="all,delete"))
     sourceentity = relationship("Entity", foreign_keys=[source_entity_id], lazy='joined')
     targetentity = relationship("Entity", foreign_keys=[target_entity_id], lazy='joined')
 
@@ -135,12 +136,12 @@ class RuleAssignmentParameter(Base):
     rule_assignment_id = Column(Integer, ForeignKey("dq2_rule_assignment.id"))
     rule_type_parameter_id = Column(Integer, ForeignKey("dq2_rule_type_parameter.id"))
     value = Column(String(250), nullable=False)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     ruleassignment = relationship("RuleAssignment", foreign_keys=[rule_assignment_id],
-                                  backref=backref("ruleassignmentparameters", lazy='joined'))
+                                  backref=backref("ruleassignmentparameters", lazy='joined',cascade="all,delete"))
     ruletypeparameter = relationship("RuleTypeParameter", foreign_keys=[rule_type_parameter_id],
-                                     backref=backref("ruleassignmentParameter", lazy='joined'))
+                                     backref=backref("ruleassignmentParameter", lazy='joined',cascade="all,delete"))
 
 
 
@@ -157,8 +158,8 @@ class RuleSet(Base):
     __tablename__ = 'dq2_rule_set'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(250), nullable=False)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
 
     def __init__(self,name):
@@ -171,11 +172,11 @@ class RuleSetAssignment(Base):
     rule_set_id = Column(Integer, ForeignKey("dq2_rule_set.id"))
     rule_assignment_id = Column(Integer, ForeignKey("dq2_rule_assignment.id"))
     active_flg = Column(String(250), nullable=False)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     ruleassignment = relationship("RuleAssignment", foreign_keys=[rule_assignment_id],
-                                  backref=backref("rulesetassignment", uselist=False, lazy='joined'))
-    ruleset = relationship("RuleSet", foreign_keys=[rule_set_id], backref=backref("rulesetassignment", lazy='joined'))
+                                  backref=backref("rulesetassignment", uselist=False, lazy='joined',cascade="all,delete"))
+    ruleset = relationship("RuleSet", foreign_keys=[rule_set_id], backref=backref("rulesetassignment", lazy='joined',cascade="all,delete"))
 
     def __init__(self, rule_set_id,rule_assignment_id,active_flg):
         self.rule_set_id = rule_set_id
@@ -189,8 +190,8 @@ class RuleLog(Base):
     id = Column(String(500), nullable=False)
     rule_assignment_id = Column(Integer, ForeignKey("dq2_rule_assignment.id"))
     rule_set_assignment_id = Column(Integer, ForeignKey("dq2_rule_set_assignment.id"))
-    data_dt = Column(Date, nullable=False, default=text('NOW()'))
-    rule_start_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    data_dt = Column(Date, nullable=False, default=datetime.datetime.now)
+    rule_start_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
     rule_end_ts = Column(DateTime, nullable=True)
     batch_dt = Column(String(45), nullable=True)
     target_sql_query = Column(String(5000), nullable=True)
@@ -201,8 +202,8 @@ class RuleLog(Base):
     status = Column(String(45), nullable=True)
     partition_type = Column(String(250), nullable=True)
     seq_num = Column(Integer)
-    create_ts = Column(DateTime, nullable=False, default=text('NOW()'))
-    update_ts = Column(DateTime, nullable=False, default=text('NOW()'))
+    create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     ruleassignment = relationship("RuleAssignment", foreign_keys=[rule_assignment_id], lazy='joined')
 
     __table_args__ = (PrimaryKeyConstraint("id", "rule_assignment_id", "rule_set_assignment_id"), )

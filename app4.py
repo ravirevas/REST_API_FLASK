@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
 app =  Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/test2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/test3'
 db = SQLAlchemy(app)
 # init marshmallow
 ma = Marshmallow(app)
@@ -65,6 +65,19 @@ def get_datastore():                                   #dump all table 1 data
 def datstore_detail(id):
     datastore_id = db.session.query(Datastore).get(id)
     return Datastore_schema.jsonify(datastore_id)
+
+
+@app.route("/datastores/<name>", methods=["GET"])
+def get_datastores(name):                                   #dump all table 1 data with name
+    expr="%"+name+"%"
+
+    result = db.session.query(Datastore).filter(Datastore.name.ilike(expr))
+    result_datastore_name = Datastores_schema.dump(result)
+    print(result)
+    #datastore_query_name = db.session.query(Datastore).filter_by(name=name)
+    #result_datastore_name = Datastores_schema.dump(datastore_query_name)
+    #print(result_datastore_name_1)
+    return jsonify(result_datastore_name.data)
 
 
 @app.route("/datastore/<id>", methods=["DELETE"])                  #delete in table1
@@ -146,6 +159,14 @@ def get_entity():
     return jsonify(result_entity.data)
 
 
+@app.route("/entities/<name>", methods=["GET"])
+def get_entity_name(name):                                        # dump all table 2 data with name
+    expr = "%" + name + "%"
+    result = db.session.query(Entity).filter(Entity.name.ilike(expr))
+    result_entity_name = Entities_schema.dump(result)
+    return jsonify(result_entity_name.data)
+
+
 
 @app.route("/entity/<id>", methods=["GET"])            #search in table 2
 def entity_details(id):
@@ -215,6 +236,18 @@ def get_ruletype():
     result_ruletype = Ruletypes_schema.dump(all_ruletype)
     print(result_ruletype)
     return jsonify(result_ruletype.data)
+
+
+
+
+@app.route("/ruletypes/<name>", methods=["GET"])
+def get_ruletype_name(name):                                        # dump all table 2 data with name
+    expr = "%" + name + "%"
+    result = db.session.query(RuleType).filter(RuleType.name.ilike(expr))
+    result_ruletype_name = Ruletypes_schema.dump(result)
+    return jsonify(result_ruletype_name.data)
+
+
 
 
 
@@ -288,6 +321,14 @@ def get_ruletypeparams():
     result_ruletype_par = Ruletypesparameters_schema.dump(all_ruletypeparams)
     print(result_ruletype_par)
     return jsonify(result_ruletype_par.data)
+
+
+@app.route("/ruletypesparams/<name>", methods=["GET"])
+def get_ruletypeparams_name(name):                                        # dump all table 4 data with name
+    expr = "%" + name + "%"
+    result = db.session.query(RuleTypeParameter).filter(RuleTypeParameter.name.ilike(expr))
+    result_ruletypeparams_name = Ruletypesparameters_schema.dump(result)
+    return jsonify(result_ruletypeparams_name.data)
 
 
 
@@ -372,6 +413,16 @@ def get_ruleassig():
 
 
 
+@app.route("/ruleassigs/<description>", methods=["GET"])
+def get_ruleassigs_name(description):                                        # dump all table 5 data with name
+    expr = "%" + description + "%"
+    result = db.session.query(RuleAssignment).filter(RuleAssignment.description.ilike(expr))
+    result_ruleassigs_name = RuleAssignments_schema.dump(result)
+    return jsonify(result_ruleassigs_name.data)
+
+
+
+
 @app.route("/ruleassig/<id>", methods=["GET"])            #search in table 5
 def ruleassig_details(id):
     ruleassig_id = db.session.query(RuleAssignment).get(id)
@@ -447,6 +498,14 @@ def get_ruleassigpara():
 
 
 
+@app.route("/ruleassignmentparas/<value>", methods=["GET"])
+def get_ruleassignmentparas_name(value):                                        # dump all table 6 data with name
+    expr = "%" + value + "%"
+    result = db.session.query(RuleAssignmentParameter).filter(RuleAssignmentParameter.value.ilike(expr))
+    result_ruleassignmentparas_name = RuleAssignmentParameters_schema.dump(result)
+    return jsonify(result_ruleassignmentparas_name.data)
+
+
 @app.route("/ruleassignmentpara/<id>", methods=["GET"])            #search in table 6
 def ruleassigpara_details(id):
     ruleassig_para_id = db.session.query(RuleAssignmentParameter).get(id)
@@ -512,6 +571,17 @@ def get_ruleset():
     result_rule_set = Rulesets_schema.dump(all_ruleset)
     print(result_rule_set)
     return jsonify(result_rule_set.data)
+
+
+
+
+@app.route("/rulesets/<name>", methods=["GET"])
+def get_rulesets_name(name):                                        # dump all table 7 data with name
+    expr = "%" + name + "%"
+    result = db.session.query(RuleSet).filter(RuleSet.name.ilike(expr))
+    result_rulesets_name = Rulesets_schema.dump(result)
+    return jsonify(result_rulesets_name.data)
+
 
 
 
