@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from rest_api_dq.app3 import *
+from rest_api_dq.metastore_model import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import configparser
