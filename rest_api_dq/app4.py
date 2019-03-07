@@ -1,11 +1,26 @@
-from flask import Flask
 from flask import Flask, request, jsonify
-from app3 import *
+from rest_api_dq.app3 import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+import configparser
+
+
+
+config = configparser.ConfigParser()
+config.read('C:\\Users\\Ravi\\PycharmProjects\\REST_API_FLASK\\conf\\config.ini')
+username = config.get('MySQL_METASTORE', 'username')
+password = config.get('MySQL_METASTORE', 'password')
+hostname = config.get('MySQL_METASTORE', 'host')
+databaseType = config.get('MySQL_METASTORE', 'databaseType')
+port = config.get('MySQL_METASTORE', 'port')
+databaseName = config.get('MySQL_METASTORE', 'databaseName')
+
 
 app =  Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/test3'
+#app.config['SQLALCHEMY_DATABASE_URI'] ='mysql+pymysql://root:root@localhost:3306/test3'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = databaseType+"+"+'pymysql://'+username+':'+password+'@'+hostname+":"+port+"/"+databaseName
+
 db = SQLAlchemy(app)
 # init marshmallow
 ma = Marshmallow(app)
