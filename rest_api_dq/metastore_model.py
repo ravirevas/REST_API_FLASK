@@ -48,7 +48,7 @@ class Entity(Base):
     unq_row_id = Column(String(250), nullable=False)
     create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
     update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
-    datastore = relationship("Datastore", backref=backref("entities",uselist=True,cascade="all,delete"))
+    datastore = relationship("Datastore", backref=backref("entities", uselist=False))
 
     def __init__(self, name, subsidiary_name, domain_name, zone,type,location,datastore_id,unq_row_id):
          self.name = name
@@ -88,7 +88,7 @@ class RuleTypeParameter(Base):
     create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
     update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     ruletype = relationship("RuleType", foreign_keys=[rule_type_id],
-                            backref=backref("ruletypeparameters",uselist=True,lazy='joined',cascade="all,delete"))
+                            backref=backref("ruletypeparameters",lazy='joined'))
 
 
     def __init__(self, rule_type_id, name, mandatory_flg, default_value):
@@ -112,9 +112,9 @@ class RuleAssignment(Base):
     create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
     update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     store_result_to_db_flg = Column(String(1), nullable=False, default=text('N'))
-    ruletype = relationship("RuleType", foreign_keys=[rule_type_id], backref=backref("ruleassignment",uselist=True,lazy='joined',cascade="all,delete"))
-    sourceentity = relationship("Entity", foreign_keys=[source_entity_id], lazy='joined',cascade="all,delete",uselist=True)
-    targetentity = relationship("Entity", foreign_keys=[target_entity_id], lazy='joined',cascade="all,delete",uselist=True)
+    ruletype = relationship("RuleType", foreign_keys=[rule_type_id], backref=backref("ruleassignment",lazy='joined'))
+    sourceentity = relationship("Entity", foreign_keys=[source_entity_id], lazy='joined')
+    targetentity = relationship("Entity", foreign_keys=[target_entity_id], lazy='joined')
 
 
     def __init__(self, description,rule_type_id,send_alert_flg,stop_job_flg,target_entity_id,source_entity_id,store_result_to_db_flg):
@@ -139,9 +139,9 @@ class RuleAssignmentParameter(Base):
     create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
     update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     ruleassignment = relationship("RuleAssignment", foreign_keys=[rule_assignment_id],
-                                  backref=backref("ruleassignmentparameters", lazy='joined',cascade="all,delete",uselist=True))
+                                  backref=backref("ruleassignmentparameters", lazy='joined'))
     ruletypeparameter = relationship("RuleTypeParameter", foreign_keys=[rule_type_parameter_id],
-                                     backref=backref("ruleassignmentParameter", lazy='joined',cascade="all,delete",uselist=True))
+                                     backref=backref("ruleassignmentParameter", lazy='joined'))
 
 
 
@@ -175,8 +175,8 @@ class RuleSetAssignment(Base):
     create_ts = Column(DateTime, nullable=False, default=datetime.datetime.now)
     update_ts = Column(DateTime, nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
     ruleassignment = relationship("RuleAssignment", foreign_keys=[rule_assignment_id],
-                                  backref=backref("rulesetassignment", uselist=True, lazy='joined',cascade="all,delete"))
-    ruleset = relationship("RuleSet", foreign_keys=[rule_set_id], backref=backref("rulesetassignment", lazy='joined',cascade="all,delete",uselist=True))
+                                  backref=backref("rulesetassignment",uselist=False,lazy='joined'))
+    ruleset = relationship("RuleSet", foreign_keys=[rule_set_id], backref=backref("rulesetassignment", lazy='joined'))
 
     def __init__(self, rule_set_id,rule_assignment_id,active_flg):
         self.rule_set_id = rule_set_id

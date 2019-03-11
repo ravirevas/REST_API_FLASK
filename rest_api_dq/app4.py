@@ -3,6 +3,8 @@ from rest_api_dq.metastore_model import *
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import configparser
+import subprocess
+
 
 
 
@@ -20,7 +22,7 @@ app =  Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] ='mysql+pymysql://root:root@localhost:3306/test3'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = databaseType+"+"+'pymysql://'+username+':'+password+'@'+hostname+":"+port+"/"+databaseName
-
+app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 # init marshmallow
 ma = Marshmallow(app)
@@ -35,6 +37,18 @@ class DatastoreSchema(ma.Schema):
 
 Datastore_schema = DatastoreSchema(strict=True)
 Datastores_schema = DatastoreSchema(many=True)
+
+
+@app.route('/drop_all_dq')
+def drop_all():
+    Base.metadata.drop_all(bind=db.engine)                #to drop all tables
+    return jsonify("Tables have been dropped")
+
+
+@app.route('/create_all_dq')
+def create_all():
+    Base.metadata.create_all(bind=db.engine)              #to create all tables
+    return jsonify("Tables have been created")
 
 
 
