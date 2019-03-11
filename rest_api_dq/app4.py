@@ -6,8 +6,6 @@ import configparser
 import subprocess
 
 
-
-
 config = configparser.ConfigParser()
 config.read('C:\\Users\\Ravi\\PycharmProjects\\REST_API_FLASK\\conf\\config.ini')
 username = config.get('MySQL_METASTORE', 'username')
@@ -23,6 +21,7 @@ app =  Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = databaseType+"+"+'pymysql://'+username+':'+password+'@'+hostname+":"+port+"/"+databaseName
 app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 # init marshmallow
 ma = Marshmallow(app)
@@ -54,6 +53,7 @@ def create_all():
 
 @app.route("/datastore", methods=["POST"])
 def add_datastore():
+
     name = request.json['name']         #insert data in table 1
 
     zone=request.json['zone']
@@ -87,6 +87,7 @@ def get_datastore():                                   #dump all table 1 data
     datastore_query = db.session.query(Datastore).all()
     result_datastore = Datastores_schema.dump(datastore_query)
     return jsonify(result_datastore.data)
+
 
 
 # endpoint to get user detail by id
@@ -132,7 +133,8 @@ Entity_schema = EntitySchema(strict=True)
 Entities_schema = EntitySchema(many=True)
 
 @app.route("/entity", methods=["POST"])
-def add_entity():                                               #insert data in table 2
+def add_entity():   #insert data in table 2
+
     name = request.json['name']
     subsidiary_name=request.json['subsidiary_name']
     domain_name=request.json['domain_name']
@@ -143,14 +145,14 @@ def add_entity():                                               #insert data in 
     unq_row_id = request.json['unq_row_id']
 
 
-
-
     new_entity = Entity(name,subsidiary_name,domain_name,zone,type,location,datastore_id,unq_row_id)
 
     db.session.add(new_entity)
     db.session.commit()
 
     return Entity_schema.jsonify(new_entity)
+
+
 
 @app.route("/entity/<id>", methods=["PUT"])
 def update_entity(id):
@@ -257,8 +259,6 @@ def update_ruletype(id):
 
 
 
-
-
 @app.route("/ruletype", methods=["GET"])                 #dump entity table 3 data
 def get_ruletype():
     all_ruletype = db.session.query(RuleType).all()
@@ -275,8 +275,6 @@ def get_ruletype_name(name):                                        # dump all t
     result = db.session.query(RuleType).filter(RuleType.name.ilike(expr))
     result_ruletype_name = Ruletypes_schema.dump(result)
     return jsonify(result_ruletype_name.data)
-
-
 
 
 
